@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# chkconfig: 3  99      05
+# processname: soffice
+# description: headless libreoffice server script
+#
+# update:  [date] [who] [what]                                                           #
+#                                                                                        #
+##########################################################################################
+
+ISRUNNING=`ps -ef | grep -v grep | grep -v soffice | grep -c soffice`
+
+case "$1" in
+    start)
+    if [ $ISRUNNING -gt 0 ]; then
+      echo "OpenOffice headless server has already started."
+      sleep 5
+      exit
+    fi
+      echo "Starting OpenOffice headless server"
+	RC=`/opt/openoffice4/program/soffice -headless -accept='socket,host=0.0.0.0,port=8100;urp;' -nofirststartwizard -nologo -norestore -nolockcheck -nocrashreport -nodefault > /dev/null &`
+    ;;
+
+    stop)
+    if [ $ISRUNNING -gt 0 ]; then
+      echo "Stopping OpenOffice headless server."
+        kill -9 `ps -ef | grep "soffice.bin" | grep -v grep | grep -v soffice | awk ' { print $2 } '` 2>/dev/null
+      exit
+    fi
+      echo "OpenOffice headless server is not running."
+      exit
+    ;;
+
+    *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+esac
